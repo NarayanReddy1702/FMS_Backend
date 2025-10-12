@@ -1,6 +1,9 @@
 import User from "../models/auth.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"
+import Student from "../models/student.model.js";
+
+
 
 async function authRegister(req, res) {
      try {
@@ -53,60 +56,77 @@ async function authRegister(req, res) {
   }
 }
 
-async function authLogin(req,res){
-   try {
-      const {email,password}=req.body
-      if(!email||!password){
-        return res.status(400).json({message:"All Fields are required !"})
-      }
 
-      const existingUser = await User.findOne({email})
-      if(!existingUser){
-        return res.status(401).json({message:"Invaild email and password"})
-      }
+async function authLogin(req, res) {
+  try {
+    const { email, password } = req.body;
 
-     const isMatch =  await bcrypt.compare(password,existingUser.password)
-     if(!isMatch){
-        return res.status(401).json({message:"Invaild email and password"})
-     }
-     const token = jwt.sign(
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required!" });
+    }
+
+    // ✅ Find user in User collection
+    const existingUser = await User.findOne({ email });
+    if (!existingUser) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // ✅ Compare password
+    const isMatch = await bcrypt.compare(password, existingUser.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
+
+    // ✅ Check role
+    if (existingUser.role !== "user") {
+      return res.status(403).json({ message: "Access denied for non-user roles" });
+    }
+
+    // ✅ Find student with same email
+    const studentData = await Student.findOne({ email });
+
+    // ✅ Generate JWT token
+    const token = jwt.sign(
       {
         _id: existingUser._id,
         email: existingUser.email,
         username: existingUser.username,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" } // token expiry
+      { expiresIn: "1d" }
     );
 
-    // Set cookie
-   res.cookie("token", token, {
-  httpOnly: true,
-  secure: false, // in development, false
-  sameSite: "lax", 
-  maxAge: 60 * 60 * 1000,
-});
+    // ✅ Set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // set true in production
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+    });
 
-    // Success response
+    // ✅ Send response with both User and Student data (if available)
     return res.status(200).json({
       message: "Login successful!",
+      success: true,
       user: {
         _id: existingUser._id,
         username: existingUser.username,
         email: existingUser.email,
         role: existingUser.role,
-        profilePic:existingUser.profilePic,
-        gender:existingUser.gender
+        profilePic: existingUser.profilePic,
+        gender: existingUser.gender,
       },
+      student: studentData || null,
       token,
-      success: true,
     });
-
   } catch (error) {
     console.error("Login error:", error.message);
     return res.status(500).json({ message: "Internal server error", success: false });
   }
 }
+
+export default authLogin;
+
 
 async function getAllUser(req,res) {
    try {
