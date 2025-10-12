@@ -234,10 +234,20 @@ async function deleteStudent(req,res) {
     if(!id){
       return res.status(404).json({message:"Failed to get ID",message:false})
     }
-    const deleteUser = await Student.findByIdAndDelete({_id:id})
+     await Student.findByIdAndDelete({_id:id})
     res.status(201).json({message:"student deleted successfully !",success:true})
   } catch (error) {
    res.status(404).json({message:"Failed to delete student !"}) 
   }
 }
-export { registerStudent,getAllStudent ,updateAdmin,deleteStudent,updateStudent};
+
+async function getOneStudent(req,res) {
+  try {
+      const {id}=req.params
+      const oneStudent =await Student.findById({_id:id})
+      res.status(201).json({message:"One student get Successfully !",success:true,student:oneStudent})
+     } catch (error) {
+      res.status(404).json({message:"Failed to get one student",success:false})
+     }
+}
+export { registerStudent,getAllStudent ,updateAdmin,deleteStudent,updateStudent,getOneStudent};
