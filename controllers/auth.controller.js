@@ -56,7 +56,6 @@ async function authRegister(req, res) {
   }
 }
 
-
 async function authLogin(req, res) {
   try {
     const { email, password } = req.body;
@@ -125,8 +124,6 @@ async function authLogin(req, res) {
     return res.status(500).json({ message: "Internal server error", success: false });
   }
 }
-
-
 
 async function getAllUser(req,res) {
    try {
