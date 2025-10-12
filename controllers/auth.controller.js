@@ -65,47 +65,40 @@ async function authLogin(req, res) {
       return res.status(400).json({ message: "All fields are required!" });
     }
 
-    // ✅ Find user in User collection
+    // Find user in User collection
     const existingUser = await User.findOne({ email });
     if (!existingUser) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // ✅ Compare password
+    // Compare password
     const isMatch = await bcrypt.compare(password, existingUser.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    // ✅ Check role
-    if (existingUser.role !== "user") {
-      return res.status(403).json({ message: "Access denied for non-user roles" });
-    }
-
-    // ✅ Find student with same email
-    const studentData = await Student.findOne({ email });
-
-    // ✅ Generate JWT token
+    // Generate JWT token
     const token = jwt.sign(
       {
         _id: existingUser._id,
         email: existingUser.email,
         username: existingUser.username,
+        role: existingUser.role,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
 
-    // ✅ Set cookie
+    // Set cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // set true in production
+      secure: false,
       sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      maxAge: 24 * 60 * 60 * 1000,
     });
 
-    // ✅ Send response with both User and Student data (if available)
-    return res.status(200).json({
+    // Prepare response
+    const response = {
       message: "Login successful!",
       success: true,
       user: {
@@ -116,16 +109,23 @@ async function authLogin(req, res) {
         profilePic: existingUser.profilePic,
         gender: existingUser.gender,
       },
-      student: studentData || null,
       token,
-    });
+    };
+
+    // ✅ Only fetch student data if role is "user"
+    if (existingUser.role === "user") {
+      const studentData = await Student.findOne({ email });
+      response.student = studentData || null;
+    }
+
+    return res.status(200).json(response);
+
   } catch (error) {
     console.error("Login error:", error.message);
     return res.status(500).json({ message: "Internal server error", success: false });
   }
 }
 
-export default authLogin;
 
 
 async function getAllUser(req,res) {
