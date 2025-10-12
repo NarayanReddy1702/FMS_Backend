@@ -8,7 +8,6 @@ const studentSchema = new mongoose.Schema(
     },
     lastName: {
       type: String,
-      required: true,
     },
     fathersName: {
       type: String,

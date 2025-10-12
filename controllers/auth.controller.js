@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken"
 
 async function authRegister(req, res) {
      try {
-    const { username, email, password ,role} = req.body;
+    const { username, email, password ,role,gender} = req.body;
 
-    if (!username || !email || !password || !role) {
+    if (!username || !email || !password || !role || !gender) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -35,6 +35,7 @@ async function authRegister(req, res) {
       password: hasPassword,
       profilePic,
       role,
+      gender
     });
 
      res
@@ -43,7 +44,8 @@ async function authRegister(req, res) {
         username:newUser.username,
         email:newUser.email,
         role:newUser.role,
-        profilePic:newUser.profilePic
+        profilePic:newUser.profilePic,
+        gender:newUser.gender
       }, success: true });
     
   } catch (error) {
@@ -93,7 +95,8 @@ async function authLogin(req,res){
         username: existingUser.username,
         email: existingUser.email,
         role: existingUser.role,
-        profilePic:existingUser.profilePic
+        profilePic:existingUser.profilePic,
+        gender:existingUser.gender
       },
       token,
       success: true,
@@ -140,7 +143,11 @@ async function updateAuth(req,res) {
     if (existingUser && existingUser._id.toString() !== id) {
       return res.status(400).json({ message: "Email already in use by another user", success: false });
     }
-      const updateUser = await User.findByIdAndUpdate(id,{email,username,gender},{new:true})
+    const profilePic =
+      gender === "male"
+        ? `https://avatar.iran.liara.run/public/boy?username=${username}`
+        : `https://avatar.iran.liara.run/public/girl?username=${username}`;
+      const updateUser = await User.findByIdAndUpdate(id,{email,username,gender,profilePic},{new:true})
       if(!updateUser){
         return res.status(501).json({message:"Auth Update Error"})
       }
