@@ -87,8 +87,6 @@ async function authLogin(req,res){
         username: existingUser.username,
         email: existingUser.email,
         role: existingUser.role,
-        profilePic:existingUser.profilePic,
-        gender:existingUser.gender
       },
       token,
       success: true,

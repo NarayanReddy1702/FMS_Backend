@@ -133,7 +133,7 @@ async function getAllStudent(req,res) {
 }
 
 
-async function updateStudent(req,res) {
+async function updateAdmin(req,res) {
    try {
     const {id}=req.params
      const {
@@ -171,6 +171,62 @@ async function updateStudent(req,res) {
    }
 }
 
+async function updateStudent(req,res) {
+   try {
+    const {id}=req.params
+     const {
+      firstName,
+      lastName,
+      fathersName,
+      mothersName,
+      phoneNo,
+      course,
+      year,
+      email,
+      gender,
+      dateOfBirth,
+      address,
+    } = req.body;
+     const existingStudent = await Student.findOne({ email });
+    if (existingStudent && existingStudent._id.toString() !== id) {
+      return res.status(400).json({ message: "Email already in use by another user", success: false });
+    }
+
+     const profilePic =
+      gender === "male"
+        ? `https://avatar.iran.liara.run/public/boy?username=${firstName}`
+        : `https://avatar.iran.liara.run/public/girl?username=${firstName}`;
+
+
+    let courseFee;
+    switch (course) {
+      case "B.Tech":
+        courseFee = 500000;
+        break;
+      case "Diploma":
+        courseFee = 350000;
+        break;
+      case "M.Tech":
+        courseFee = 400000;
+        break;
+      case "MBA":
+        courseFee = 1000000;
+        break;
+      default:
+        courseFee = 0;
+    }
+
+   const updateStudent =  await Student.findByIdAndUpdate(id,{firstName,lastName,fathersName,mothersName,phoneNo,course,year,profilePic,courseFee,email,gender,dateOfBirth,address},{new:true})
+   if(!updateStudent){
+    return res.status(501).json({message:"Uupdate Fail"})
+   }
+
+   res.status(201).json({message:"Update Successfully !" , success:true,student :updateStudent})
+   } catch (error) {
+      res.status(404).json({message:"Failed to update student"})
+   }
+}
+
 async function deleteStudent(req,res) {
   try {
     const {id}=req.params
@@ -184,4 +240,4 @@ async function deleteStudent(req,res) {
    res.status(404).json({message:"Failed to delete student !"}) 
   }
 }
-export { registerStudent,getAllStudent ,updateStudent,deleteStudent};
+export { registerStudent,getAllStudent ,updateAdmin,deleteStudent,updateStudent};
