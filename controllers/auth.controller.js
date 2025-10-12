@@ -22,6 +22,10 @@ async function authRegister(req, res) {
       return res.status(409).json({ message: "User already registered" });
     }
 
+ const profilePic =
+      gender === "male"
+        ? `https://avatar.iran.liara.run/public/boy?username=${username}`
+        : `https://avatar.iran.liara.run/public/girl?username=${username}`;
 
     const hasPassword = await bcrypt.hash(password, 10);
 
@@ -29,6 +33,7 @@ async function authRegister(req, res) {
       username,
       email,
       password: hasPassword,
+      profilePic,
       role,
     });
 
@@ -37,7 +42,8 @@ async function authRegister(req, res) {
       .json({ message: "Register successfully !", user:{
         username:newUser.username,
         email:newUser.email,
-        role:newUser.role
+        role:newUser.role,
+        profilePic:newUser.profilePic
       }, success: true });
     
   } catch (error) {
@@ -87,6 +93,7 @@ async function authLogin(req,res){
         username: existingUser.username,
         email: existingUser.email,
         role: existingUser.role,
+        profilePic:existingUser.profilePic
       },
       token,
       success: true,
