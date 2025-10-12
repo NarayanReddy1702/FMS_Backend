@@ -151,7 +151,14 @@ async function updateAuth(req,res) {
       if(!updateUser){
         return res.status(501).json({message:"Auth Update Error"})
       }
-      res.status(201).json({message:"Update successfully !",success:true,updateUser})
+      res.status(201).json({message:"Update successfully !",success:true,user:{
+        username:updateUser.username,
+        email:updateUser.email,
+        profilePic:updateUser.profilePic,
+        gender:updateUser.gender,
+        role:updateUser.role,
+        _id:updateUser._id
+      }})
    } catch (error) {
        res.status(404).json({message:"failed to update user"})
    }
