@@ -163,6 +163,16 @@ async function updateAuth(req,res) {
        res.status(404).json({message:"failed to update user"})
    }
 }
+async function getOneUser(req,res) {
+     try {
+      const {id}=req.params
+      const getOneUser =await User.findOne({_id:id})
+      res.status(201).json({message:"One user get Successfully !",success:true,userDet:getOneUser})
+     } catch (error) {
+      res.status(404).json({message:"Failed to get one User",success:false})
+     }
+     
+}
 
 async function deleteUser(req,res) {
   try {
@@ -179,4 +189,4 @@ async function deleteUser(req,res) {
     res.status(404).json({message:"failed to delete user",success:true})
   }
 }
-export { authRegister ,authLogin,getAllUser,updateAuth,deleteUser};
+export { authRegister ,authLogin,getAllUser,updateAuth,deleteUser,getOneUser};
