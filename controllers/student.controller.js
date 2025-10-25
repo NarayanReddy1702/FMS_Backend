@@ -69,7 +69,6 @@ async function registerStudent(req, res) {
       default:
         courseFee = 0;
     }
-
     // 5️⃣ Create new student
     const newStudent = await Student.create({
       firstName,
@@ -119,24 +118,33 @@ async function registerStudent(req, res) {
   }
 }
 
-async function getAllStudent(req,res) {
+async function getAllStudent(req, res) {
   try {
-    const studentDet = await Student.find()
-    if(studentDet.length===0){
-      return res.status(404).json({message:"No student Found" , success:false})
-    }    
-  
-    res.status(201).json({message:"Get All Student Successfully !", student:studentDet, success:true})
+    const studentDet = await Student.find();
+    if (studentDet.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No student Found", success: false });
+    }
+
+    res
+      .status(201)
+      .json({
+        message: "Get All Student Successfully !",
+        student: studentDet,
+        success: true,
+      });
   } catch (error) {
-    res.status(404).json({message:"Failed to get all student",success:false})
+    res
+      .status(404)
+      .json({ message: "Failed to get all student", success: false });
   }
 }
 
-
-async function updateAdmin(req,res) {
-   try {
-    const {id}=req.params
-     const {
+async function updateAdmin(req, res) {
+  try {
+    const { id } = req.params;
+    const {
       firstName,
       lastName,
       fathersName,
@@ -150,31 +158,61 @@ async function updateAdmin(req,res) {
       dateOfBirth,
       address,
     } = req.body;
-     const existingStudent = await Student.findOne({ email });
+    const existingStudent = await Student.findOne({ email });
     if (existingStudent && existingStudent._id.toString() !== id) {
-      return res.status(400).json({ message: "Email already in use by another user", success: false });
+      return res
+        .status(400)
+        .json({
+          message: "Email already in use by another user",
+          success: false,
+        });
     }
 
-     const profilePic =
+
+    const profilePic =
       gender === "male"
         ? `https://avatar.iran.liara.run/public/boy?username=${firstName}`
         : `https://avatar.iran.liara.run/public/girl?username=${firstName}`;
 
-   const updateStudent =  await Student.findByIdAndUpdate(id,{firstName,lastName,fathersName,mothersName,phoneNo,course,year,profilePic,courseFee,email,gender,dateOfBirth,address},{new:true})
-   if(!updateStudent){
-    return res.status(501).json({message:"Uupdate Fail"})
-   }
+    const updateStudent = await Student.findByIdAndUpdate(
+      id,
+      {
+        firstName,
+        lastName,
+        fathersName,
+        mothersName,
+        phoneNo,
+        course,
+        year,
+        profilePic,
+        courseFee,
+        email,
+        gender,
+        dateOfBirth,
+        address,
+      },
+      { new: true }
+    );
+    if (!updateStudent) {
+      return res.status(501).json({ message: "Update Fail" });
+    }
 
-   res.status(201).json({message:"Update Successfully !" , success:true,student :updateStudent})
-   } catch (error) {
-      res.status(404).json({message:"Failed to update student"})
-   }
+    res
+      .status(201)
+      .json({
+        message: "Update Successfully !",
+        success: true,
+        student: updateStudent,
+      });
+  } catch (error) {
+    res.status(404).json({ message: "Failed to update student" });
+  }
 }
 
-async function updateStudent(req,res) {
-   try {
-    const {id}=req.params
-     const {
+async function updateStudent(req, res) {
+  try {
+    const { id } = req.params;
+    const {
       firstName,
       lastName,
       fathersName,
@@ -187,16 +225,20 @@ async function updateStudent(req,res) {
       dateOfBirth,
       address,
     } = req.body;
-     const existingStudent = await Student.findOne({ email });
+    const existingStudent = await Student.findOne({ email });
     if (existingStudent && existingStudent._id.toString() !== id) {
-      return res.status(400).json({ message: "Email already in use by another user", success: false });
+      return res
+        .status(400)
+        .json({
+          message: "Email already in use by another user",
+          success: false,
+        });
     }
 
-     const profilePic =
+    const profilePic =
       gender === "male"
         ? `https://avatar.iran.liara.run/public/boy?username=${firstName}`
         : `https://avatar.iran.liara.run/public/girl?username=${firstName}`;
-
 
     let courseFee;
     switch (course) {
@@ -216,38 +258,81 @@ async function updateStudent(req,res) {
         courseFee = 0;
     }
 
-   const updateStudent =  await Student.findByIdAndUpdate(id,{firstName,lastName,fathersName,mothersName,phoneNo,course,year,profilePic,courseFee,email,gender,dateOfBirth,address},{new:true})
-   if(!updateStudent){
-    return res.status(501).json({message:"Uupdate Fail"})
-   }
-
-   res.status(201).json({message:"Update Successfully !" , success:true,student :updateStudent})
-   } catch (error) {
-      res.status(404).json({message:"Failed to update student"})
-   }
-}
-
-async function deleteStudent(req,res) {
-  try {
-    const {id}=req.params
-
-    if(!id){
-      return res.status(404).json({message:"Failed to get ID",message:false})
+    const updateStudent = await Student.findByIdAndUpdate(
+      id,
+      {
+        firstName,
+        lastName,
+        fathersName,
+        mothersName,
+        phoneNo,
+        course,
+        year,
+        profilePic,
+        courseFee,
+        email,
+        gender,
+        dateOfBirth,
+        address,
+      },
+      { new: true }
+    );
+    if (!updateStudent) {
+      return res.status(501).json({ message: "Uupdate Fail" });
     }
-     await Student.findByIdAndDelete({_id:id})
-    res.status(201).json({message:"student deleted successfully !",success:true})
+
+    res
+      .status(201)
+      .json({
+        message: "Update Successfully !",
+        success: true,
+        student: updateStudent,
+      });
   } catch (error) {
-   res.status(404).json({message:"Failed to delete student !"}) 
+    res.status(404).json({ message: "Failed to update student" });
   }
 }
 
-async function getOneStudent(req,res) {
+async function deleteStudent(req, res) {
   try {
-      const {id}=req.params
-      const oneStudent =await Student.findById({_id:id})
-      res.status(201).json({message:"One student get Successfully !",success:true,student:oneStudent})
-     } catch (error) {
-      res.status(404).json({message:"Failed to get one student",success:false})
-     }
+    const { id } = req.params;
+
+    if (!id) {
+      return res
+        .status(404)
+        .json({ message: "Failed to get ID", message: false });
+    }
+    await Student.findByIdAndDelete({ _id: id });
+    res
+      .status(201)
+      .json({ message: "student deleted successfully !", success: true });
+  } catch (error) {
+    res.status(404).json({ message: "Failed to delete student !" });
+  }
 }
-export { registerStudent,getAllStudent ,updateAdmin,deleteStudent,updateStudent,getOneStudent};
+
+async function getOneStudent(req, res) {
+  try {
+    const { id } = req.params;
+    const oneStudent = await Student.findById({ _id: id });
+    res
+      .status(201)
+      .json({
+        message: "One student get Successfully !",
+        success: true,
+        student: oneStudent,
+      });
+  } catch (error) {
+    res
+      .status(404)
+      .json({ message: "Failed to get one student", success: false });
+  }
+}
+export {
+  registerStudent,
+  getAllStudent,
+  updateAdmin,
+  deleteStudent,
+  updateStudent,
+  getOneStudent,
+};
