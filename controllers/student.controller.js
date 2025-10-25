@@ -174,7 +174,10 @@ async function updateAdmin(req, res) {
         ? `https://avatar.iran.liara.run/public/boy?username=${firstName}`
         : `https://avatar.iran.liara.run/public/girl?username=${firstName}`;
 
-        
+         const validatedCourseFee =
+      courseFee === null || courseFee === undefined || courseFee === ""
+        ? 0
+        : courseFee;
 
     const updateStudent = await Student.findByIdAndUpdate(
       id,
@@ -187,7 +190,7 @@ async function updateAdmin(req, res) {
         course,
         year,
         profilePic,
-        courseFee:courseFee==null?0:courseFee,
+        courseFee:validatedCourseFee,
         email,
         gender,
         dateOfBirth,

@@ -28,6 +28,7 @@ const studentSchema = new mongoose.Schema(
     },
     courseFee: {
       type: Number,
+      default:0
     },
     year: {
       type: String,
