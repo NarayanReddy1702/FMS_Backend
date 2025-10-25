@@ -174,6 +174,8 @@ async function updateAdmin(req, res) {
         ? `https://avatar.iran.liara.run/public/boy?username=${firstName}`
         : `https://avatar.iran.liara.run/public/girl?username=${firstName}`;
 
+        
+
     const updateStudent = await Student.findByIdAndUpdate(
       id,
       {
@@ -185,7 +187,7 @@ async function updateAdmin(req, res) {
         course,
         year,
         profilePic,
-        courseFee,
+        courseFee:courseFee==null?0:courseFee,
         email,
         gender,
         dateOfBirth,
