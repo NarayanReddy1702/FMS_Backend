@@ -37,6 +37,12 @@ async function registerStudent(req, res) {
         .json({ message: "All fields are required!", success: false });
     }
 
+    if (String(phoneNo).length !== 10) {
+      return res
+        .status(404)
+        .json({ message: "PhoneNo length must be ten number", success: false });
+    }
+
     // 2️⃣ Check if student already exists
     const existingStudent = await Student.findOne({ email });
     if (existingStudent) {
@@ -127,13 +133,11 @@ async function getAllStudent(req, res) {
         .json({ message: "No student Found", success: false });
     }
 
-    res
-      .status(201)
-      .json({
-        message: "Get All Student Successfully !",
-        student: studentDet,
-        success: true,
-      });
+    res.status(201).json({
+      message: "Get All Student Successfully !",
+      student: studentDet,
+      success: true,
+    });
   } catch (error) {
     res
       .status(404)
@@ -160,21 +164,24 @@ async function updateAdmin(req, res) {
     } = req.body;
     const existingStudent = await Student.findOne({ email });
     if (existingStudent && existingStudent._id.toString() !== id) {
-      return res
-        .status(400)
-        .json({
-          message: "Email already in use by another user",
-          success: false,
-        });
+      return res.status(400).json({
+        message: "Email already in use by another user",
+        success: false,
+      });
     }
 
+    if (String(phoneNo).length !== 10) {
+      return res
+        .status(404)
+        .json({ message: "PhoneNo length must be ten number", success: false });
+    }
 
     const profilePic =
       gender === "male"
         ? `https://avatar.iran.liara.run/public/boy?username=${firstName}`
         : `https://avatar.iran.liara.run/public/girl?username=${firstName}`;
 
-         const validatedCourseFee =
+    const validatedCourseFee =
       courseFee === null || courseFee === undefined || courseFee === ""
         ? 0
         : courseFee;
@@ -190,7 +197,7 @@ async function updateAdmin(req, res) {
         course,
         year,
         profilePic,
-        courseFee:validatedCourseFee,
+        courseFee: validatedCourseFee,
         email,
         gender,
         dateOfBirth,
@@ -202,13 +209,11 @@ async function updateAdmin(req, res) {
       return res.status(501).json({ message: "Update Fail" });
     }
 
-    res
-      .status(201)
-      .json({
-        message: "Update Successfully !",
-        success: true,
-        student: updateStudent,
-      });
+    res.status(201).json({
+      message: "Update Successfully !",
+      success: true,
+      student: updateStudent,
+    });
   } catch (error) {
     res.status(404).json({ message: "Failed to update student" });
   }
@@ -230,14 +235,19 @@ async function updateStudent(req, res) {
       dateOfBirth,
       address,
     } = req.body;
+
     const existingStudent = await Student.findOne({ email });
     if (existingStudent && existingStudent._id.toString() !== id) {
+      return res.status(400).json({
+        message: "Email already in use by another user",
+        success: false,
+      });
+    }
+
+    if (String(phoneNo).length !== 10) {
       return res
-        .status(400)
-        .json({
-          message: "Email already in use by another user",
-          success: false,
-        });
+        .status(404)
+        .json({ message: "PhoneNo length must be ten number", success: false });
     }
 
     const profilePic =
@@ -286,13 +296,11 @@ async function updateStudent(req, res) {
       return res.status(501).json({ message: "Uupdate Fail" });
     }
 
-    res
-      .status(201)
-      .json({
-        message: "Update Successfully !",
-        success: true,
-        student: updateStudent,
-      });
+    res.status(201).json({
+      message: "Update Successfully !",
+      success: true,
+      student: updateStudent,
+    });
   } catch (error) {
     res.status(404).json({ message: "Failed to update student" });
   }
@@ -320,13 +328,11 @@ async function getOneStudent(req, res) {
   try {
     const { id } = req.params;
     const oneStudent = await Student.findById({ _id: id });
-    res
-      .status(201)
-      .json({
-        message: "One student get Successfully !",
-        success: true,
-        student: oneStudent,
-      });
+    res.status(201).json({
+      message: "One student get Successfully !",
+      success: true,
+      student: oneStudent,
+    });
   } catch (error) {
     res
       .status(404)
